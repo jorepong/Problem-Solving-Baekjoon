@@ -1,23 +1,31 @@
-import sys
 from collections import deque
 
-n, k = map(int, sys.stdin.readline().strip().split())
+def solve():
+    n, k = map(int, input().split())
+    
+    if n == k:
+        print(0)
+        return
 
-queue = deque([(n, 0)])
-visited = [False] * 100001
+    MAX = 100001
+    visited = [False] * MAX
+    queue = deque([(n, 0)])  # (위치, 시간)
 
-while queue:
-    item, day = queue.popleft()
+    visited[n] = True
 
-    if item < 0 or item > 100000 or visited[item]:
-        continue
+    while queue:
+        pos, time = queue.popleft()
 
-    if item == k:
-        print(day)
-        break
+        if pos == k:
+            print(time)
+            return
 
-    visited[item] = True
+        # 이동 가능한 세 가지 경우를 탐색
+        next_positions = [pos - 1, pos + 1, pos * 2]
 
-    queue.append((item+1, day+1))
-    queue.append((item-1, day+1))
-    queue.append((item*2, day+1))
+        for next_pos in next_positions:
+            if 0 <= next_pos < MAX and not visited[next_pos]:
+                visited[next_pos] = True
+                queue.append((next_pos, time + 1))
+
+solve()
