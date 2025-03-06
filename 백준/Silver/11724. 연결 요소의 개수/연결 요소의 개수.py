@@ -1,36 +1,32 @@
-import sys
-sys.setrecursionlimit(10**6)
+#연결 요소의 개수 
+import sys 
+input = sys.stdin.readline
+sys.setrecursionlimit(10**6)  # 재귀 깊이 증가 
 
-N, M = map(int, sys.stdin.readline().strip().split())
+N, M = map(int, input().split()) #정점 개수, 간선 개수 
 
-graph = [[] for _ in range(N+1)]
+def dfs(graph, v, visited):
+    visited[v] = True
+    for i in graph[v]:
+        if visited[i]==False: 
+            dfs(graph, i, visited)
 
+
+
+# 그래프 입력 (adjacency list 방식)
+graph = [[] for _ in range(N + 1)] 
 for _ in range(M):
-    u, v = map(int, sys.stdin.readline().strip().split())
+    u, v = map(int, input().split())
     graph[u].append(v)
     graph[v].append(u)
 
-connected_component = 0
+visited = [False] * (N+1)
+cnt = 0
 
-nodes_in_graph = set()
-for i in range(1, N+1):
-    if graph[i]:
-        nodes_in_graph.add(i)
-        
-connected_component += N - len(nodes_in_graph)
+for i in range(1, N + 1):
+    if visited[i]==False:
+        dfs(graph, i, visited)
+        cnt += 1
+ 
+print(cnt)
 
-visited = set()
-
-def dfs(key):
-    if key in visited:
-        return
-    visited.add(key)
-    for k in graph[key]:
-        dfs(k)
-
-for v in range(1, N+1):
-    if graph[v] and v not in visited:
-        dfs(v)
-        connected_component += 1
-
-print(connected_component)
