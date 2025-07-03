@@ -1,51 +1,47 @@
-from collections import defaultdict, deque
+import sys
+from collections import deque
 
+input = sys.stdin.readline
 
-def dfs(graph, start, visited):
-    if start in visited:
-        return
+n, m, v = map(int, input().split())
 
-    visited.append(start)
+graph = [[] for _ in range(n + 1)]
 
-    for v in graph[start]:
-        dfs(graph, v, visited)
+for _ in range(m):
+    a, b = map(int, input().split())
+    graph[a].append(b)
+    graph[b].append(a)
 
-def bfs(graph, start, visited):
-    queue = deque([start])
+for i in range(1, n + 1):
+    graph[i].sort()
+
+visited_dfs = [False] * (n + 1)
+path_dfs = []
+
+def dfs(node):
+    visited_dfs[node] = True
+    path_dfs.append(node)
+    for next_node in graph[node]:
+        if not visited_dfs[next_node]:
+            dfs(next_node)
+
+visited_bfs = [False] * (n + 1)
+path_bfs = []
+
+def bfs(start_node):
+    queue = deque([start_node])
+    visited_bfs[start_node] = True
 
     while queue:
-        v = queue.popleft()
+        node = queue.popleft()
+        path_bfs.append(node)
+        for next_node in graph[node]:
+            if not visited_bfs[next_node]:
+                queue.append(next_node)
+                visited_bfs[next_node] = True
 
-        if v in visited:
-            continue
+dfs(v)
+bfs(v)
 
-        visited.append(v)
-
-        for s in graph[v]:
-            if s not in visited:
-                queue.append(s)
-
-
-def solve():
-    N, M, V = map(int, input().split())
-    graph = defaultdict(list)
-    for _ in range(M):
-        v1, v2 = map(int, input().split())
-        graph[v1].append(v2)
-        graph[v2].append(v1)
-
-    for i in range(1, N+1):
-        graph[i].sort()
-
-    path = []
-    dfs(graph, V, path)
-
-    path2 = []
-    bfs(graph, V, path2)
-
-    print(' '.join(list(map(str, path))))
-    print(' '.join(list(map(str, path2))))
-
-
-if __name__ == "__main__":
-    solve()
+print(*path_dfs)
+print(*path_bfs)
