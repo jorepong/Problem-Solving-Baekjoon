@@ -1,38 +1,45 @@
 import sys
-from collections import defaultdict
 
 sys.setrecursionlimit(10**6)
 
-n, r = map(int, sys.stdin.readline().strip().split())
-graph = defaultdict(list)
+n, r = map(int, sys.stdin.readline().split())
 
-for _ in range(n-1):
-    v1, v2 = map(int, sys.stdin.readline().strip().split())
+graph = [[] for _ in range(n + 1)] 
+for _ in range(n - 1):
+    v1, v2 = map(int, sys.stdin.readline().split())
     graph[v1].append(v2)
     graph[v2].append(v1)
 
-values = [-1] * (n+1)
-visited = [False] * (n+1)
-for _ in range(int(sys.stdin.readline().strip())):
-    v, value = map(int, sys.stdin.readline().strip().split())
+values = [-1] * (n + 1)
+visited = [False] * (n + 1)
+
+leaf_count = int(sys.stdin.readline())
+for _ in range(leaf_count):
+    v, value = map(int, sys.stdin.readline().split())
     values[v] = value
 
 def dfs(node, depth):
-    if depth % 2 == 0:
-        ret = -float('inf')
-    else:
-        ret = float('inf')
-
     visited[node] = True
-    for v in graph[node]:
-        if visited[v]:
-            continue
-        if depth % 2 == 0:
-            ret = max(ret, dfs(v, depth + 1))
-        else:
-            ret = min(ret, dfs(v, depth + 1))
+    
+    is_leaf = True
+    
+    if depth % 2 == 0:
+        ret = -1
+    else:
+        ret = 10**9 + 1
 
-    if ret == float('inf') or ret == -float('inf'):
+    for v in graph[node]:
+        if not visited[v]:
+            is_leaf = False 
+            
+            child_value = dfs(v, depth + 1)
+            
+            if depth % 2 == 0:
+                ret = max(ret, child_value)
+            else:
+                ret = min(ret, child_value)
+
+    if is_leaf:
         return values[node]
 
     values[node] = ret
@@ -40,7 +47,7 @@ def dfs(node, depth):
 
 dfs(r, 0)
 
-q = int(sys.stdin.readline().strip())
-for _ in range(q):
-    node = int(input())
+q_count = int(sys.stdin.readline())
+for _ in range(q_count):
+    node = int(sys.stdin.readline())
     print(values[node])
