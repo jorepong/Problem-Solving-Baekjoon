@@ -52,13 +52,17 @@ def dfs(board, is_my_turn):
     for i in range(3):
         for j in range(3):
             if board[i][j] == 0:
-                new_board = deepcopy(board)
-                new_board[i][j] = my if is_my_turn else op
-                result = dfs(new_board, not is_my_turn)
+                board[i][j] = my if is_my_turn else op
+                result = dfs(board, not is_my_turn)
                 if is_my_turn:
                     final_result = max(final_result, result.value)
+                    if final_result == State.win:
+                        return State(final_result)
                 else:
                     final_result = min(final_result, result.value)
+                    if final_result == State.lose:
+                        return State(final_result)
+                board[i][j] = 0
 
     return State(final_result)
 
