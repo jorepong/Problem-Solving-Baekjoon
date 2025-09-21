@@ -1,40 +1,36 @@
 import heapq
 import sys
-sys.setrecursionlimit(10**6)
+from collections import defaultdict
 
-n, m = map(int, input().split())
+v, e = map(int, sys.stdin.readline().split())
+graph = defaultdict(list)
 
-heap = []
-for _ in range(m):
-    data = list(map(int, input().split()))
-    heapq.heappush(heap, (data[2], data[0], data[1]))
+for _ in range(e):
+    a, b, weight = map(int, sys.stdin.readline().split())
+    graph[a].append((b, weight))
+    graph[b].append((a, weight))
 
-parent = list(range(0, n+1))
+def prim(start):
+    result = 0
 
-def find(v):
-    if v == parent[v]:
-        return v
-    else:
-        parent[v] = find(parent[v])
-        return parent[v]
+    heap = []
+    for node, weight in graph[start]:
+        heapq.heappush(heap, (weight, node))
 
-def union(v1, v2):
-    p1 = find(v1)
-    p2 = find(v2)
+    visited = {start}
+    count = 0
+    while count < v-1:
+        weight, target = heapq.heappop(heap)
 
-    if p1 != p2:
-        if p1 < p2:
-            parent[p2] = v1
-        else:
-            parent[p1] = p2
-        return True
-    return False
+        if target not in visited:
+            result += weight
+            visited.add(target)
+            count += 1
 
-answer = 0
+            for node, w in graph[target]:
+                heapq.heappush(heap, (w, node))
 
-while heap:
-    w, s, e = heapq.heappop(heap)
-    if union(s, e):
-        answer += w
+    return result
 
-print(answer)
+
+print(prim(1))
