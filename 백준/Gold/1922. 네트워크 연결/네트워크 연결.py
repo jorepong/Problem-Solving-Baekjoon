@@ -1,37 +1,41 @@
-import heapq
 import sys
-from collections import defaultdict
 
-v = int(sys.stdin.readline())
-e = int(sys.stdin.readline())
-graph = defaultdict(list)
+N = int(sys.stdin.readline())
+M = int(sys.stdin.readline())
 
-for _ in range(e):
-    a, b, weight = map(int, sys.stdin.readline().split())
-    graph[a].append((b, weight))
-    graph[b].append((a, weight))
+weights = []
+for _ in range(M):
+    a, b, c = map(int, sys.stdin.readline().split())
+    weights.append((c, a, b))
 
-def prim(start):
-    result = 0
+root = list(range(N+1))
 
-    heap = []
-    for node, weight in graph[start]:
-        heapq.heappush(heap, (weight, node))
+def union(a, b):
+    a_root = find(a)
+    b_root = find(b)
 
-    visited = {start}
-    count = 0
-    while count < v-1:
-        weight, target = heapq.heappop(heap)
+    if a_root != b_root:
+        if a_root < b_root:
+            root[b_root] = a_root
+        else:
+            root[a_root] = b_root
 
-        if target not in visited:
-            result += weight
-            visited.add(target)
-            count += 1
+def find(node):
+    if root[node] == node:
+        return node
 
-            for node, w in graph[target]:
-                heapq.heappush(heap, (w, node))
+    root[node] = find(root[node])
+    return root[node]
 
-    return result
+total_weight = 0
+count = 0
+for weight, a, b in sorted(weights):
+    if count == N-1:
+        break
+    if find(a) == find(b):
+        continue
+    union(a, b)
+    total_weight += weight
+    count += 1
 
-
-print(prim(1))
+print(total_weight)
